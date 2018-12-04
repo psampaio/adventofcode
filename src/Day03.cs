@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace AdventOfCode
 {
@@ -35,7 +32,7 @@ namespace AdventOfCode
                     }
                 }
             }
-            
+
             return sum;
         }
 
@@ -59,13 +56,13 @@ namespace AdventOfCode
                 .GroupBy(c => c.Id)
                 .Select(group => new
                 {
-                    Claim = @group.First(),
-                    Count = @group.Count()
+                    Claim = group.First(),
+                    Count = group.Count()
                 })
                 .Where(x => x.Count == x.Claim.Area)
                 .Select(x => x.Claim.Id)
                 .First();
-         }
+        }
 
         private static FabricUnit[,] CalculateFabric(IEnumerable<string> lines)
         {
@@ -91,17 +88,21 @@ namespace AdventOfCode
 
         private class FabricUnit
         {
-            public List<Claim> Claims { get; }
-
             public FabricUnit()
             {
                 Claims = new List<Claim>();
             }
+
+            public List<Claim> Claims { get; }
         }
 
         private class Claim
         {
             private static readonly Regex RegexPattern = new Regex(@"#(\d*) @ (\d*),(\d*): (\d*)x(\d*)");
+
+            private Claim()
+            {
+            }
 
             public int Id { get; private set; }
             public int Left { get; private set; }
@@ -110,10 +111,6 @@ namespace AdventOfCode
             public int Height { get; private set; }
 
             public int Area => Width * Height;
-
-            private Claim()
-            {
-            }
 
             public static Claim Parse(string line)
             {

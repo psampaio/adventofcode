@@ -6,12 +6,12 @@ using Lamar;
 
 namespace AdventOfCode
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             Console.WriteLine("Loading Puzzles!");
-            
+
             var container = new Container(x =>
             {
                 x.Scan(s =>
@@ -21,7 +21,8 @@ namespace AdventOfCode
                 });
             });
 
-            var inputDir = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "input"));
+            string inputDir =
+                Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "input"));
 
             var puzzles = container.GetAllInstances<IPuzzle>().OrderBy(p => p.Day).ToList();
             Console.WriteLine($"Found puzzles until day {puzzles.Count}.");
@@ -29,11 +30,11 @@ namespace AdventOfCode
             do
             {
                 Console.Write("Please type the day or 'e' to exit: ");
-                var line = Console.ReadLine();
-                if (int.TryParse(line, out var dayNumber) && dayNumber > 0 && dayNumber <= puzzles.Count)
+                string line = Console.ReadLine();
+                if (int.TryParse(line, out int dayNumber) && dayNumber > 0 && dayNumber <= puzzles.Count)
                 {
                     var puzzle = puzzles.Single(p => p.Day == dayNumber);
-                    var fileName = Path.Combine(inputDir, $"day{dayNumber}.txt");
+                    string fileName = Path.Combine(inputDir, $"day{dayNumber}.txt");
                     if (!File.Exists(fileName))
                     {
                         Console.WriteLine($"Input file not found ({fileName})");
@@ -45,6 +46,7 @@ namespace AdventOfCode
                         Console.WriteLine($"\tPart 1 result: {puzzle.RunPart1(lines)}");
                         Console.WriteLine($"\tPart 2 result: {puzzle.RunPart2(lines)}");
                     }
+
                     repeat = true;
                 }
                 else if (line == "e")
@@ -55,7 +57,6 @@ namespace AdventOfCode
                 {
                     repeat = true;
                 }
-
             } while (repeat);
         }
     }
