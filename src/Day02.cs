@@ -8,7 +8,7 @@ namespace AdventOfCode
     {
         public int Day => 2;
 
-        public object RunPart1(string[] lines)
+        public object RunPart1(string[] input)
         {
             //lines = new []
             //{
@@ -24,7 +24,7 @@ namespace AdventOfCode
             var appearsTwoTimes = 0;
             var appearsThreeTimes = 0;
 
-            foreach (var line in lines)
+            foreach (var line in input)
             {
                 var letterCountPerLine = new int[26];
                 foreach (var c in line)
@@ -61,7 +61,7 @@ namespace AdventOfCode
             return appearsTwoTimes * appearsThreeTimes;
         }
 
-        public object RunPart2(string[] lines)
+        public object RunPart2(string[] input)
         {
             //lines = new []
             //{
@@ -74,14 +74,14 @@ namespace AdventOfCode
             //    "wvxyz"
             //};
 
-            var lineLength = lines[0].Length;
+            var lineLength = input[0].Length;
 
-            for (var outer = 0; outer < lines.Length - 1; outer++)
+            for (var outer = 0; outer < input.Length - 1; outer++)
             {
-                var line = lines[outer];
-                for (var inner = outer + 1; inner < lines.Length; inner++)
+                var line = input[outer];
+                for (var inner = outer + 1; inner < input.Length; inner++)
                 {
-                    var nextLine = lines[inner];
+                    var nextLine = input[inner];
                     var result = new StringBuilder();
                     for (var i = 0; i < line.Length; i++)
                     {

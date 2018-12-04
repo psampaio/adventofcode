@@ -10,7 +10,7 @@ namespace AdventOfCode
 
         public int Day => 3;
 
-        public object RunPart1(string[] lines)
+        public object RunPart1(string[] input)
         {
             //lines = new []
             //{
@@ -19,7 +19,7 @@ namespace AdventOfCode
             //    "#3 @ 5,5: 2x2"
             //};
 
-            var fabric = CalculateFabric(lines);
+            var fabric = CalculateFabric(input);
 
             int sum = 0;
             for (int i = 0; i < FabricSize; i++)
@@ -36,9 +36,9 @@ namespace AdventOfCode
             return sum;
         }
 
-        public object RunPart2(string[] lines)
+        public object RunPart2(string[] input)
         {
-            var fabric = CalculateFabric(lines);
+            var fabric = CalculateFabric(input);
 
             var candidateClaims = new List<Claim>();
             for (int i = 0; i < FabricSize; i++)

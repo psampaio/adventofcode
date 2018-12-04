@@ -7,17 +7,17 @@ namespace AdventOfCode
     {
         public int Day => 1;
 
-        public object RunPart1(string[] lines)
+        public object RunPart1(string[] input)
         {
-            return lines.Sum(int.Parse);
+            return input.Sum(int.Parse);
         }
 
-        public object RunPart2(string[] lines)
+        public object RunPart2(string[] input)
         {
             int result = 0;
             var results = new Dictionary<int, bool>();
 
-            var frequencies = lines.Select(int.Parse).ToList();
+            var frequencies = input.Select(int.Parse).ToList();
             //var frequencies = new[] {1, -1};
             //var frequencies = new[] { 3, 3, 4, -2, -4 };
             //var frequencies = new[] {-6, 3, 8, 5, -6};
