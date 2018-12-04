@@ -9,17 +9,17 @@ namespace AdventOfCode
     {
         public int Day => 1;
 
-        public async Task<object> RunPart1(string input)
+        public object RunPart1(string[] lines)
         {
-            return (await File.ReadAllLinesAsync(input)).Sum(int.Parse);
+            return lines.Sum(int.Parse);
         }
 
-        public async Task<object> RunPart2(string input)
+        public object RunPart2(string[] lines)
         {
             var result = 0;
             var results = new List<int> {0};
 
-            var frequencies = (await File.ReadAllLinesAsync(input)).Select(int.Parse).ToList();
+            var frequencies = lines.Select(int.Parse).ToList();
             //var frequencies = new[] {1, -1};
             //var frequencies = new[] { 3, 3, 4, -2, -4 };
             //var frequencies = new[] {-6, 3, 8, 5, -6};

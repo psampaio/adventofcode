@@ -41,8 +41,9 @@ namespace AdventOfCode
                     else
                     {
                         Console.WriteLine($"Running puzzle for day {dayNumber}");
-                        Console.WriteLine($"\tPart 1 result: {await puzzle.RunPart1(fileName)}");
-                        Console.WriteLine($"\tPart 2 result: {await puzzle.RunPart2(fileName)}");
+                        var lines = await File.ReadAllLinesAsync(fileName);
+                        Console.WriteLine($"\tPart 1 result: {puzzle.RunPart1(lines)}");
+                        Console.WriteLine($"\tPart 2 result: {puzzle.RunPart2(lines)}");
                     }
                     repeat = true;
                 }

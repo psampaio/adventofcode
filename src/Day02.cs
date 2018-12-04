@@ -10,10 +10,9 @@ namespace AdventOfCode
     {
         public int Day => 2;
 
-        public async Task<object> RunPart1(string input)
+        public object RunPart1(string[] lines)
         {
-            var lines = await File.ReadAllLinesAsync(input);
-            //var lines = new[]
+            //lines = new []
             //{
             //    "abcdef",
             //    "bababc",
@@ -64,10 +63,9 @@ namespace AdventOfCode
             return appearsTwoTimes * appearsThreeTimes;
         }
 
-        public async Task<object> RunPart2(string input)
+        public object RunPart2(string[] lines)
         {
-            var lines = await File.ReadAllLinesAsync(input);
-            //var lines = new[]
+            //lines = new []
             //{
             //    "abcde",
             //    "fghij",
