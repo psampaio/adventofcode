@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 // ReSharper disable StringLiteralTypo
@@ -9,7 +10,7 @@ namespace AdventOfCode
     {
         public int Day => 2;
 
-        public async Task<int> RunPart1(string input)
+        public async Task<object> RunPart1(string input)
         {
             var lines = await File.ReadAllLinesAsync(input);
             //var lines = new[]
@@ -63,9 +64,46 @@ namespace AdventOfCode
             return appearsTwoTimes * appearsThreeTimes;
         }
 
-        public Task<int> RunPart2(string input)
+        public async Task<object> RunPart2(string input)
         {
-            return Task.FromResult(0);
+            var lines = await File.ReadAllLinesAsync(input);
+            //var lines = new[]
+            //{
+            //    "abcde",
+            //    "fghij",
+            //    "klmno",
+            //    "pqrst",
+            //    "fguij",
+            //    "axcye",
+            //    "wvxyz"
+            //};
+
+            var lineLength = lines[0].Length;
+
+            for (var outer = 0; outer < lines.Length - 1; outer++)
+            {
+                var line = lines[outer];
+                for (var inner = outer + 1; inner < lines.Length; inner++)
+                {
+                    var nextLine = lines[inner];
+                    var result = new StringBuilder();
+                    for (var i = 0; i < line.Length; i++)
+                    {
+                        var sameLetter = line[i] == nextLine[i];
+                        if (sameLetter)
+                        {
+                            result.Append(line[i]);
+                        }
+                    }
+
+                    if (result.Length == lineLength - 1)
+                    {
+                        return result.ToString();
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

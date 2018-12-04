@@ -43,7 +43,6 @@ namespace AdventOfCode
                         Console.WriteLine($"Running puzzle for day {dayNumber}");
                         Console.WriteLine($"\tPart 1 result: {await puzzle.RunPart1(fileName)}");
                         Console.WriteLine($"\tPart 2 result: {await puzzle.RunPart2(fileName)}");
-                        
                     }
                     repeat = true;
                 }

@@ -9,12 +9,12 @@ namespace AdventOfCode
     {
         public int Day => 1;
 
-        public async Task<int> RunPart1(string input)
+        public async Task<object> RunPart1(string input)
         {
             return (await File.ReadAllLinesAsync(input)).Sum(int.Parse);
         }
 
-        public async Task<int> RunPart2(string input)
+        public async Task<object> RunPart2(string input)
         {
             var result = 0;
             var results = new List<int> {0};
