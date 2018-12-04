@@ -18,10 +18,6 @@ namespace AdventOfCode
             var results = new Dictionary<int, bool>();
 
             var frequencies = input.Select(int.Parse).ToList();
-            //var frequencies = new[] {1, -1};
-            //var frequencies = new[] { 3, 3, 4, -2, -4 };
-            //var frequencies = new[] {-6, 3, 8, 5, -6};
-            //var frequencies = new [] {7, 7, -2, -7, -4};
             bool foundResult = false;
             do
             {

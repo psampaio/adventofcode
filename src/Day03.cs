@@ -12,13 +12,6 @@ namespace AdventOfCode
 
         public object RunPart1(string[] input)
         {
-            //lines = new []
-            //{
-            //    "#1 @ 1,3: 4x4",
-            //    "#2 @ 3,1: 4x4",
-            //    "#3 @ 5,5: 2x2"
-            //};
-
             var fabric = CalculateFabric(input);
 
             int sum = 0;

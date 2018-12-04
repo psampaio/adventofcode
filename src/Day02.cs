@@ -10,31 +10,20 @@ namespace AdventOfCode
 
         public object RunPart1(string[] input)
         {
-            //lines = new []
-            //{
-            //    "abcdef",
-            //    "bababc",
-            //    "abbcde",
-            //    "abcccd",
-            //    "aabcdd",
-            //    "abcdee",
-            //    "ababab",
-            //};
+            int appearsTwoTimes = 0;
+            int appearsThreeTimes = 0;
 
-            var appearsTwoTimes = 0;
-            var appearsThreeTimes = 0;
-
-            foreach (var line in input)
+            foreach (string line in input)
             {
                 var letterCountPerLine = new int[26];
-                foreach (var c in line)
+                foreach (char c in line)
                 {
                     letterCountPerLine[c - 97]++;
                 }
 
-                var incrementTwoCount = false;
-                var incrementThreeCount = false;
-                foreach (var c in letterCountPerLine)
+                bool incrementTwoCount = false;
+                bool incrementThreeCount = false;
+                foreach (int c in letterCountPerLine)
                 {
                     if (c == 2)
                     {
@@ -74,18 +63,18 @@ namespace AdventOfCode
             //    "wvxyz"
             //};
 
-            var lineLength = input[0].Length;
+            int lineLength = input[0].Length;
 
-            for (var outer = 0; outer < input.Length - 1; outer++)
+            for (int outer = 0; outer < input.Length - 1; outer++)
             {
-                var line = input[outer];
-                for (var inner = outer + 1; inner < input.Length; inner++)
+                string line = input[outer];
+                for (int inner = outer + 1; inner < input.Length; inner++)
                 {
-                    var nextLine = input[inner];
+                    string nextLine = input[inner];
                     var result = new StringBuilder();
-                    for (var i = 0; i < line.Length; i++)
+                    for (int i = 0; i < line.Length; i++)
                     {
-                        var sameLetter = line[i] == nextLine[i];
+                        bool sameLetter = line[i] == nextLine[i];
                         if (sameLetter)
                         {
                             result.Append(line[i]);
