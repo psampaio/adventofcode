@@ -9,10 +9,42 @@ namespace AdventOfCode
 
         public object RunPart1(string[] input)
         {
-            var line = input[0];
-            //var line = "dabAcCaCBAcCcaDA";
-            var list = new LinkedList<char>(line);
+            var list = new LinkedList<char>(input[0]);
+            ReactUnits(list);
+            return list.Count;
+        }
 
+        public object RunPart2(string[] input)
+        {
+            int listSize = int.MaxValue;
+            for (int i = 97; i <= 122; i++)
+            {
+                var list = new LinkedList<char>(input[0]);
+                var node = list.First;
+                while (node != null)
+                {
+                    var nextNode = node.Next;
+
+                    if (node.Value == i || node.Value == i - 32)
+                    {
+                        list.Remove(node);
+                    }
+
+                    node = nextNode;
+                }
+
+                ReactUnits(list);
+                if (list.Count < listSize)
+                {
+                    listSize = list.Count;
+                }
+            }
+
+            return listSize;
+        }
+
+        private static void ReactUnits(LinkedList<char> list)
+        {
             var node = list.First;
             while (node != null)
             {
@@ -34,13 +66,6 @@ namespace AdventOfCode
                     node = nextNode;
                 }
             }
-
-            return list.Count;
-        }
-
-        public object RunPart2(string[] input)
-        {
-            return null;
         }
     }
 }
