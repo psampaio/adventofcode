@@ -22,7 +22,7 @@ namespace AdventOfCode
 //            };
 
             var points = input.Select(Point.FromLine).ToList();
-            int gridSize = Math.Max(points.Max(p => p.X), points.Max(p => p.Y)) +1;
+            int gridSize = Math.Max(points.Max(p => p.X), points.Max(p => p.Y)) + 1;
             var grid = new Distance[gridSize, gridSize];
 
             foreach (var point in points)
@@ -55,16 +55,15 @@ namespace AdventOfCode
                 }
             }
 
-            foreach (var invalidPoint in GetPointsWithInfiniteArea(grid))
+            for (int i1 = 0; i1 < grid.GetLength(0); i1++)
             {
-                points.Remove(invalidPoint);
+                grid[i1, 0].Point?.RemoveFrom(points);
+                grid[i1, grid.GetLength(0) - 1].Point?.RemoveFrom(points);
+                grid[0, i1].Point?.RemoveFrom(points);
+                grid[grid.GetLength(0) - 1, i1].Point?.RemoveFrom(points);
             }
 
-            var areaCount = new Dictionary<Point, int>();
-            foreach (var point in points)
-            {
-                areaCount.Add(point, 0);
-            }
+            var areaCount = points.ToDictionary(p => p, _ => 0);
             for (int i = 0; i < grid.GetLength(1); i++)
             {
                 for (int j = 0; j < grid.GetLength(0); j++)
@@ -80,62 +79,6 @@ namespace AdventOfCode
             return areaCount.Values.Max();
         }
 
-        private static IEnumerable<Point> GetPointsWithInfiniteArea(Distance[,] grid)
-        {
-            var pointsWithInfiniteArea = new List<Point>();
-            for (int i = 0; i < grid.GetLength(0); i++)
-            {
-                var point = grid[i, 0].Point;
-                if (point == null)
-                {
-                    continue;
-                }
-
-                if (!pointsWithInfiniteArea.Contains(point))
-                {
-                    pointsWithInfiniteArea.Add(point);
-                }
-
-                point = grid[i, grid.GetLength(0) - 1].Point;
-                if (point == null)
-                {
-                    continue;
-                }
-
-                if (!pointsWithInfiniteArea.Contains(point))
-                {
-                    pointsWithInfiniteArea.Add(point);
-                }
-            }
-
-            for (int i = 0; i < grid.GetLength(0); i++)
-            {
-                var point = grid[0, i].Point;
-                if (point == null)
-                {
-                    continue;
-                }
-
-                if (!pointsWithInfiniteArea.Contains(point))
-                {
-                    pointsWithInfiniteArea.Add(point);
-                }
-
-                point = grid[grid.GetLength(0) - 1, i].Point;
-                if (point == null)
-                {
-                    continue;
-                }
-
-                if (!pointsWithInfiniteArea.Contains(point))
-                {
-                    pointsWithInfiniteArea.Add(point);
-                }
-            }
-
-            return pointsWithInfiniteArea;
-        }
-
         public object RunPart2(string[] input)
         {
             return null;
@@ -149,7 +92,7 @@ namespace AdventOfCode
 
         private class Point
         {
-            private static readonly Regex linePattern = new Regex(@"(\d*), (\d*)");
+            private static readonly Regex LinePattern = new Regex(@"(\d*), (\d*)");
 
             public int Y { get; private set; }
 
@@ -157,13 +100,18 @@ namespace AdventOfCode
 
             public static Point FromLine(string line)
             {
-                var match = linePattern.Match(line);
+                var match = LinePattern.Match(line);
                 var point = new Point
                 {
                     X = int.Parse(match.Groups[1].Value),
                     Y = int.Parse(match.Groups[2].Value)
                 };
                 return point;
+            }
+
+            public void RemoveFrom(ICollection<Point> points)
+            {
+                points.Remove(this);
             }
         }
     }
