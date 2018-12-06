@@ -11,16 +11,6 @@ namespace AdventOfCode
 
         public object RunPart1(string[] input)
         {
-//            input = new[]
-//            {
-//                "1, 1",
-//                "1, 6",
-//                "8, 3",
-//                "3, 4",
-//                "5, 5",
-//                "8, 9"
-//            };
-
             var points = input.Select(Point.FromLine).ToList();
             int gridSize = Math.Max(points.Max(p => p.X), points.Max(p => p.Y)) + 1;
             var grid = new Distance[gridSize, gridSize];
@@ -31,9 +21,7 @@ namespace AdventOfCode
                 {
                     for (int j = 0; j < grid.GetLength(1); j++)
                     {
-                        int deltaX = Math.Abs(point.X - i);
-                        int deltaY = Math.Abs(point.Y - j);
-                        int currentDistance = deltaX + deltaY;
+                        int currentDistance = Math.Abs(point.X - i) + Math.Abs(point.Y - j);
                         if (grid[i, j] == null)
                         {
                             grid[i, j] = new Distance
@@ -58,15 +46,15 @@ namespace AdventOfCode
             for (int i1 = 0; i1 < grid.GetLength(0); i1++)
             {
                 grid[i1, 0].Point?.RemoveFrom(points);
-                grid[i1, grid.GetLength(0) - 1].Point?.RemoveFrom(points);
+                grid[i1, grid.GetLength(1) - 1].Point?.RemoveFrom(points);
                 grid[0, i1].Point?.RemoveFrom(points);
                 grid[grid.GetLength(0) - 1, i1].Point?.RemoveFrom(points);
             }
 
             var areaCount = points.ToDictionary(p => p, _ => 0);
-            for (int i = 0; i < grid.GetLength(1); i++)
+            for (int i = 0; i < grid.GetLength(0); i++)
             {
-                for (int j = 0; j < grid.GetLength(0); j++)
+                for (int j = 0; j < grid.GetLength(1); j++)
                 {
                     var point = grid[i, j].Point;
                     if (point != null && areaCount.ContainsKey(point))
@@ -81,7 +69,34 @@ namespace AdventOfCode
 
         public object RunPart2(string[] input)
         {
-            return null;
+            var points = input.Select(Point.FromLine).ToList();
+            int gridSize = Math.Max(points.Max(p => p.X), points.Max(p => p.Y)) + 1;
+            var grid = new int[gridSize, gridSize];
+
+            foreach (var point in points)
+            {
+                for (int i = 0; i < grid.GetLength(0); i++)
+                {
+                    for (int j = 0; j < grid.GetLength(1); j++)
+                    {
+                        grid[i, j] += Math.Abs(point.X - i) + Math.Abs(point.Y - j);
+                    }
+                }
+            }
+
+            int sum = 0;
+            for (int i = 0; i < grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < grid.GetLength(1); j++)
+                {
+                    if (grid[i, j] < 10000)
+                    {
+                        sum++;
+                    }
+                }
+            }
+
+            return sum;
         }
 
         private class Distance
