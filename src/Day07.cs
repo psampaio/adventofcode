@@ -10,73 +10,108 @@ namespace AdventOfCode
 
         public object RunPart1(string[] input)
         {
-//            input = new[]
-//            {
-//                "Step C must be finished before step A can begin.",
-//                "Step C must be finished before step F can begin.",
-//                "Step A must be finished before step B can begin.",
-//                "Step A must be finished before step D can begin.",
-//                "Step B must be finished before step E can begin.",
-//                "Step D must be finished before step E can begin.",
-//                "Step F must be finished before step E can begin."
-//            };
+            return RunBoth(input, 1).Result;
+        }
 
-            var stepMap = new Dictionary<int, Step>();
+        public object RunPart2(string[] input)
+        {
+            return RunBoth(input, 5).EllapsedTime;
+        }
 
-            foreach (string instruction in input)
+        public (string Result, int EllapsedTime) RunBoth(string[] input, int workerCount, int timeOffset = 0)
+        {
+            var steps = ParseSteps(input);
+            int stepCount = steps.Count;
+            var nextSteps = steps.Where(s => !s.From.Any()).OrderBy(s => s.Letter).ToList();
+
+            var workers = new List<Worker>();
+            for (int i = 0; i < workerCount; i++)
             {
-                if (!stepMap.TryGetValue(instruction[5], out var from))
+                workers.Add(new Worker());
+            }
+
+            var orderedSteps = new List<Step>();
+            var result = new StringBuilder();
+
+            int ellapsedTime = 0;
+            do
+            {
+                foreach (var worker in workers.Where(w => w.Step != null))
                 {
-                    from = new Step(new string(new[] {instruction[5]}));
-                    stepMap.Add(instruction[5], from);
+                    if (worker.RemainingType > 0)
+                    {
+                        worker.RemainingType--;
+                    }
+
+                    if (worker.RemainingType == 0)
+                    {
+                        var currentStep = worker.Step;
+                        orderedSteps.Add(currentStep);
+                        steps.Remove(currentStep);
+                        result.Append(currentStep.Letter);
+                        foreach (var step in currentStep.To)
+                        {
+                            if (!nextSteps.Contains(step))
+                            {
+                                nextSteps.Add(step);
+                            }
+                        }
+                    }
                 }
 
-                if (!stepMap.TryGetValue(instruction[36], out var to))
+                foreach (var worker in workers.Where(w => w.RemainingType == 0))
+                {
+                    if (nextSteps.Any())
+                    {
+                        nextSteps = nextSteps.OrderBy(s => s.Letter).ToList();
+                        var currentStep = nextSteps.FirstOrDefault(s => s.From.All(orderedSteps.Contains));
+                        worker.Step = currentStep;
+                        if (currentStep == null)
+                        {
+                            continue;
+                        }
+
+                        worker.RemainingType = currentStep.Letter[0] - 4;
+                        nextSteps.Remove(currentStep);
+                    }
+                    else
+                    {
+                        worker.Step = null;
+                    }
+                }
+
+                ellapsedTime++;
+            } while (result.Length != stepCount);
+
+            return (result.ToString(), ellapsedTime - 1);
+        }
+
+        private static List<Step> ParseSteps(IEnumerable<string> input)
+        {
+            var steps = new List<Step>();
+            foreach (string instruction in input)
+            {
+                string fromLetter = new string(new[] {instruction[5]});
+                var from = steps.SingleOrDefault(s => s.Letter == fromLetter);
+                if (from == null)
+                {
+                    from = new Step(fromLetter);
+                    steps.Add(from);
+                }
+
+                string toLetter = new string(new[] {instruction[36]});
+                var to = steps.SingleOrDefault(s => s.Letter == toLetter);
+                if (to == null)
                 {
                     to = new Step(new string(new[] {instruction[36]}));
-                    stepMap.Add(instruction[36], to);
+                    steps.Add(to);
                 }
 
                 from.To.Add(to);
                 to.From.Add(from);
             }
 
-            var steps = stepMap.Values.ToList();
-            var startingSteps = steps.Where(s => !s.From.Any()).OrderBy(s => s.Letter).ToList();
-
-            var orderedSteps = new List<Step>();
-            var currentStep = startingSteps.First();
-            var nextSteps = startingSteps.Skip(1).ToList();
-            var result = new StringBuilder();
-            while (steps.Any())
-            {
-                orderedSteps.Add(currentStep);
-                steps.Remove(currentStep);
-                result.Append(currentStep.Letter);
-                foreach (var step in currentStep.To)
-                {
-                    if (!nextSteps.Contains(step))
-                    {
-                        nextSteps.Add(step);
-                    }
-                }
-
-                if (!nextSteps.Any())
-                {
-                    continue;
-                }
-                
-                nextSteps = nextSteps.OrderBy(s => s.Letter).ToList();
-                currentStep = nextSteps.First(s => s.From.All(orderedSteps.Contains));
-                nextSteps.Remove(currentStep);
-            }
-
-            return result.ToString();
-        }
-
-        public object RunPart2(string[] input)
-        {
-            return null;
+            return steps;
         }
 
         private class Step
@@ -93,6 +128,12 @@ namespace AdventOfCode
             public IList<Step> To { get; }
 
             public IList<Step> From { get; }
+        }
+
+        private class Worker
+        {
+            public Step Step { get; set; }
+            public int RemainingType { get; set; }
         }
     }
 }
