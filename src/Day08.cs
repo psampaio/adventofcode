@@ -6,19 +6,25 @@ namespace AdventOfCode
     public class Day08 : IPuzzle
     {
         public int Day => 8;
-        
+
         public object RunPart1(string[] input)
         {
             var numbers = input[0].Split(" ").Select(int.Parse).ToList();
-//            var numbers = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2".Split(" ").Select(int.Parse).ToList();
             (var root, int length) = Node.Build(numbers, 0);
             return root.CalculateMetadata();
         }
 
+        public object RunPart2(string[] input)
+        {
+            var numbers = input[0].Split(" ").Select(int.Parse).ToList();
+            (var root, int length) = Node.Build(numbers, 0);
+            return root.CalculateValue();
+        }
+
         private class Node
         {
-            private readonly List<int> metadata;
             private readonly List<Node> children;
+            private readonly List<int> metadata;
 
             private Node()
             {
@@ -36,7 +42,25 @@ namespace AdventOfCode
 
                 return sum;
             }
-            
+
+            public int CalculateValue()
+            {
+                if (!children.Any())
+                {
+                    return CalculateMetadata();
+                }
+
+                int sum = 0;
+                foreach (int index in metadata)
+                {
+                    var child = children.ElementAtOrDefault(index - 1);
+                    sum += child?.CalculateValue() ?? 0;
+                }
+
+                return sum;
+            }
+
+
             public static (Node Node, int Length) Build(IList<int> numbers, int startIndex)
             {
                 Node node;
@@ -49,7 +73,7 @@ namespace AdventOfCode
                     node.metadata.AddRange(numbers.Skip(startIndex + 2).Take(metadataCount));
                     return (node, 2 + metadataCount);
                 }
-                
+
                 node = new Node();
                 int childrenLength = 0;
                 for (int i = 0; i < childrenCount; i++)
@@ -58,15 +82,11 @@ namespace AdventOfCode
                     childrenLength += length;
                     node.children.Add(child);
                 }
+
                 node.metadata.AddRange(numbers.Skip(startIndex + 2 + childrenLength).Take(metadataCount));
 
                 return (node, 2 + childrenLength + metadataCount);
             }
-        }
-
-        public object RunPart2(string[] input)
-        {
-            return null;
         }
     }
 }
