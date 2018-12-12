@@ -6,6 +6,10 @@ namespace AdventOfCode
 {
     public class Day11 : IPuzzle
     {
+        private const int GridSize = 300;
+        private static int[][] cachedGrid;
+        private static IEnumerable<Result> cachedResults;
+
         public int Day => 11;
 
         public object RunPart1(string[] input)
@@ -26,85 +30,92 @@ namespace AdventOfCode
             return $"{result.X},{result.Y},{result.Size}";
         }
 
-        private static int[,] CreateGrid(int serialNumber)
+        private static int[][] CreateGrid(int serialNumber)
         {
-            int gridSize = 300;
-            var grid = new int[gridSize + 1, gridSize + 1];
-            for (int j = 1; j < grid.GetLength(1); j++)
+            if (cachedGrid != null)
             {
-                for (int i = 1; i < grid.GetLength(0); i++)
+                return cachedGrid;
+            }
+
+            cachedGrid = new int[GridSize][];
+            for (int j = 0; j < GridSize; j++)
+            {
+                var subGrid = new int[GridSize];
+                for (int i = 0; i < GridSize; i++)
                 {
-                    int id = i + 10;
-                    int level = id * j;
+                    int id = i + 1 + 10;
+                    int level = id * (j + 1);
                     level += serialNumber;
                     level = level * id;
                     level = level < 100 ? 0 : Math.Abs(level / 100 % 10);
 
-                    grid[i, j] = level - 5;
+                    subGrid[i] = level - 5;
                 }
+
+                cachedGrid[j] = subGrid;
             }
 
-            return grid;
+            return cachedGrid;
         }
 
-        private static IEnumerable<Result> CalculateLevel(int[,] grid)
+        private static IEnumerable<Result> CalculateLevel(int[][] grid)
         {
+            if (cachedResults != null)
+            {
+                return cachedResults;
+            }
+
             var results = new List<Result>();
 
-            int gridSize = 300;
-            for (int size = 0; size < gridSize; size++)
+            Result previousSizeResult = null;
+            for (int size = 0; size < GridSize; size++)
             {
+                int iLength = GridSize - size;
+                int jLength = GridSize - size;
                 var result = new Result
                 {
                     Size = size + 1,
-                    Grid = new int[gridSize - size, gridSize - size]
+                    Grid = new int[jLength][]
                 };
 
                 int x = int.MinValue;
                 int y = int.MinValue;
                 int maxLevel = int.MinValue;
-                for (int j = 0; j < result.Grid.GetLength(1); j++)
+                for (int j = 0; j < jLength; j++)
                 {
-                    for (int i = 0; i < result.Grid.GetLength(0); i++)
+                    var subGrid = new int[iLength];
+                    for (int i = 0; i < iLength; i++)
                     {
-                        try
+                        int level;
+
+                        if (previousSizeResult == null)
                         {
-                            int level;
-
-                            if (size == 0)
+                            level = grid[j][i];
+                        }
+                        else
+                        {
+                            level = previousSizeResult.Grid[j][i];
+                            for (int delta = i; delta < i + size + 1; delta++)
                             {
-                                level = grid[i, j];
-                            }
-                            else
-                            {
-                                var previousSizeResult = results.ElementAt(size - 1);
-                                level = previousSizeResult.Grid[i, j];
-                                for (int delta = i; delta < i + size + 1; delta++)
-                                {
-                                    level += grid[delta, j + size];
-                                }
-
-                                for (int delta = j; delta < j + size; delta++)
-                                {
-                                    level += grid[i + size, delta];
-                                }
+                                level += grid[j + size][delta];
                             }
 
-                            result.Grid[i, j] = level;
-                        
-                            if (level > maxLevel)
+                            for (int delta = j; delta < j + size; delta++)
                             {
-                                maxLevel = level;
-                                x = i;
-                                y = j;
+                                level += grid[delta][i + size];
                             }
                         }
-                        catch (Exception e)
+
+                        subGrid[i] = level;
+                        if (level > maxLevel)
                         {
-                            Console.WriteLine(e);
-                            throw;
+                            maxLevel = level;
+                            x = i + 1;
+                            y = j + 1;
                         }
                     }
+
+                    result.Grid[j] = subGrid;
                 }
 
                 result.Level = maxLevel;
@@ -112,14 +123,16 @@ namespace AdventOfCode
                 result.Y = y;
 
                 results.Add(result);
+                previousSizeResult = result;
             }
 
+            cachedResults = results;
             return results;
         }
 
         private class Result
         {
-            public int[,] Grid { get; set; }
+            public int[][] Grid { get; set; }
 
             public int Level { get; set; }
 
