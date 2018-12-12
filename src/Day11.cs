@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode
 {
@@ -9,7 +11,23 @@ namespace AdventOfCode
         public object RunPart1(string[] input)
         {
             int serialNumber = int.Parse(input[0]);
+            var grid = CreateGrid(serialNumber);
+            var resultList = CalculateLevel(grid);
+            var result = resultList.Single(r => r.Size == 3);
+            return $"{result.X},{result.Y}";
+        }
 
+        public object RunPart2(string[] input)
+        {
+            int serialNumber = int.Parse(input[0]);
+            var grid = CreateGrid(serialNumber);
+            var resultList = CalculateLevel(grid);
+            var result = resultList.Aggregate((r1, r2) => r1.Level > r2.Level ? r1 : r2);
+            return $"{result.X},{result.Y},{result.Size}";
+        }
+
+        private static int[,] CreateGrid(int serialNumber)
+        {
             int gridSize = 300;
             var grid = new int[gridSize + 1, gridSize + 1];
             for (int j = 1; j < grid.GetLength(1); j++)
@@ -26,32 +44,90 @@ namespace AdventOfCode
                 }
             }
 
-            int x = 0;
-            int y = 0;
-            int maxLevel = int.MinValue;
-            for (int j = 1; j < grid.GetLength(1) - 2; j++)
-            {
-                for (int i = 1; i < grid.GetLength(0) - 2; i++)
-                {
-                    int level = grid[i, j] + grid[i + 1, j] + grid[i + 2, j] +
-                                grid[i, j + 1] + grid[i + 1, j + 1] + grid[i + 2, j + 1] +
-                                grid[i, j + 2] + grid[i + 1, j + 2] + grid[i + 2, j + 2];
-
-                    if (level > maxLevel)
-                    {
-                        maxLevel = level;
-                        x = i;
-                        y = j;
-                    }
-                }
-            }
-
-            return $"{x},{y}";
+            return grid;
         }
 
-        public object RunPart2(string[] input)
+        private static IEnumerable<Result> CalculateLevel(int[,] grid)
         {
-            return null;
+            var results = new List<Result>();
+
+            int gridSize = 300;
+            for (int size = 0; size < gridSize; size++)
+            {
+                var result = new Result
+                {
+                    Size = size + 1,
+                    Grid = new int[gridSize - size, gridSize - size]
+                };
+
+                int x = int.MinValue;
+                int y = int.MinValue;
+                int maxLevel = int.MinValue;
+                for (int j = 0; j < result.Grid.GetLength(1); j++)
+                {
+                    for (int i = 0; i < result.Grid.GetLength(0); i++)
+                    {
+                        try
+                        {
+                            int level;
+
+                            if (size == 0)
+                            {
+                                level = grid[i, j];
+                            }
+                            else
+                            {
+                                var previousSizeResult = results.ElementAt(size - 1);
+                                level = previousSizeResult.Grid[i, j];
+                                for (int delta = i; delta < i + size + 1; delta++)
+                                {
+                                    level += grid[delta, j + size];
+                                }
+
+                                for (int delta = j; delta < j + size; delta++)
+                                {
+                                    level += grid[i + size, delta];
+                                }
+                            }
+
+                            result.Grid[i, j] = level;
+                        
+                            if (level > maxLevel)
+                            {
+                                maxLevel = level;
+                                x = i;
+                                y = j;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            throw;
+                        }
+                    }
+                }
+
+                result.Level = maxLevel;
+                result.X = x;
+                result.Y = y;
+
+                results.Add(result);
+            }
+
+            return results;
+        }
+
+        private class Result
+        {
+            public int[,] Grid { get; set; }
+
+            public int Level { get; set; }
+
+            public int Size { get; set; }
+
+            public int X { get; set; }
+
+            public int Y { get; set; }
         }
     }
 }
