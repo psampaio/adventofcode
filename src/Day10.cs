@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,10 +12,20 @@ namespace AdventOfCode
 
         public object RunPart1(string[] input)
         {
+            return RunBothParts(input).Output;
+        }
+
+        public object RunPart2(string[] input)
+        {
+            return RunBothParts(input).Iteration;
+        }
+
+        private static (string Output, int Iteration) RunBothParts(IEnumerable<string> input)
+        {
             var stars = input.Select(Star.Parse).ToList();
 
-            long lengthX = stars.Max(s => s.Position.X) - stars.Min(s => s.Position.X);
-            long lengthY = stars.Max(s => s.Position.Y) - stars.Min(s => s.Position.Y);
+            int lengthX = stars.Max(s => s.Position.X) - stars.Min(s => s.Position.X);
+            int lengthY = stars.Max(s => s.Position.Y) - stars.Min(s => s.Position.Y);
 
             int iteration = 0;
             bool contracting;
@@ -26,8 +37,8 @@ namespace AdventOfCode
                     star.Position.Y += star.Velocity.Y;
                 }
 
-                long newLengthX = stars.Max(s => s.Position.X) - stars.Min(s => s.Position.X);
-                long newLengthY = stars.Max(s => s.Position.Y) - stars.Min(s => s.Position.Y);
+                int newLengthX = stars.Max(s => s.Position.X) - stars.Min(s => s.Position.X);
+                int newLengthY = stars.Max(s => s.Position.Y) - stars.Min(s => s.Position.Y);
 
                 if (lengthX + lengthY >= newLengthX + newLengthY)
                 {
@@ -37,20 +48,28 @@ namespace AdventOfCode
                 }
                 else
                 {
-                    foreach (var star in stars)
-                    {
-                        star.Position.X -= star.Velocity.X;
-                        star.Position.Y -= star.Velocity.Y;
-                    }
-
                     contracting = false;
                 }
 
                 iteration++;
             } while (contracting);
 
-            int minX = stars.Min(s => s.Position.X);
-            int minY = stars.Min(s => s.Position.Y);
+            int minX = int.MaxValue;
+            int minY = int.MaxValue;
+            foreach (var star in stars)
+            {
+                star.Position.X -= star.Velocity.X;
+                star.Position.Y -= star.Velocity.Y;
+                if (star.Position.X < minX)
+                {
+                    minX = star.Position.X;
+                }
+                if (star.Position.Y < minY)
+                {
+                    minY = star.Position.Y;
+                }
+            }
+            iteration--;
 
             var grid = new bool[++lengthX, ++lengthY];
             foreach (var star in stars)
@@ -70,12 +89,7 @@ namespace AdventOfCode
                 output.AppendLine();
             }
 
-            return output.ToString();
-        }
-
-        public object RunPart2(string[] input)
-        {
-            return null;
+            return (output.ToString(), iteration);
         }
 
         private class Star
